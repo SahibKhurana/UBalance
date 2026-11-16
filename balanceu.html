@@ -1,0 +1,363 @@
+<title>BalanceU</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: project brief on the left, a working phone-sized app on the right; on phones the app fills the screen */
+:root{
+  --bg:#EEF3EC; --surface:#FFFFFF; --surface-2:#F5F8F3; --fg:#1C2A1F; --muted:#5E6E61; --line:#D8E2D5;
+  --leaf:#2F6B3A; --leaf-ink:#FFFFFF; --river:#2A8C82; --sun:#D9A13B; --alert:#C2553B;
+  --c-study:#3F6FB5; --c-work:#7A5BB0; --c-rest:#2A8C82; --c-exercise:#D9822B; --c-meal:#B9862E; --c-sleep:#4B5A8A; --c-commute:#7C877E;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111813; --surface:#18221B; --surface-2:#1F2B22; --fg:#E4EDE4; --muted:#9AAB9D; --line:#2C3A2F;
+  --leaf:#7FC28A; --leaf-ink:#0F1A11; --river:#5CC2B6; --sun:#E8BC62; --alert:#E58A72;
+  --c-study:#7EA6E6; --c-work:#B49AE3; --c-rest:#5CC2B6; --c-exercise:#F0A55C; --c-meal:#DDB461; --c-sleep:#9AA8D9; --c-commute:#A9B4AB;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#111813; --surface:#18221B; --surface-2:#1F2B22; --fg:#E4EDE4; --muted:#9AAB9D; --line:#2C3A2F;
+  --leaf:#7FC28A; --leaf-ink:#0F1A11; --river:#5CC2B6; --sun:#E8BC62; --alert:#E58A72;
+  --c-study:#7EA6E6; --c-work:#B49AE3; --c-rest:#5CC2B6; --c-exercise:#F0A55C; --c-meal:#DDB461; --c-sleep:#9AA8D9; --c-commute:#A9B4AB;
+  color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--river);outline-offset:2px}
+.stage{max-width:1120px;margin:0 auto;display:grid;gap:40px;align-items:start}
+@media (min-width:980px){.stage{grid-template-columns:minmax(0,1fr) 400px}}
+
+/* Brief panel */
+.brief{display:flex;flex-direction:column;gap:22px;min-width:0;padding-top:8px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--leaf);font-weight:600}
+.brief h1{font-size:clamp(40px,6vw,64px);font-weight:800;letter-spacing:-.02em;color:var(--leaf)}
+.brief .lede{font-size:18px;max-width:58ch;color:var(--fg)}
+.pov{border-left:3px solid var(--river);padding:4px 0 4px 16px;max-width:62ch;color:var(--muted)}
+.pov b{color:var(--fg);font-weight:600}
+.map{display:grid;gap:10px;max-width:640px}
+.map-row{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.map-row span:first-child{color:var(--muted);font-size:14px}
+.map-row .arrow{color:var(--river);font-weight:700}
+.map-row span:last-child{font-weight:600;font-size:14px}
+.personas{display:flex;flex-wrap:wrap;gap:8px}
+.persona{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.small{font-size:13px;color:var(--muted)}
+@media (max-width:979px){.brief{order:2}}
+
+/* Phone */
+.phone{background:var(--surface);border:1px solid var(--line);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;
+  height:820px;max-height:calc(100vh - 48px);min-height:640px;box-shadow:0 24px 60px -30px rgba(20,50,25,.45);position:relative}
+@media (max-width:979px){.phone{border-radius:24px;height:auto;max-height:none;min-height:0}}
+.app-head{padding:22px 20px 12px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:1px solid var(--line)}
+.app-head h2{font-size:24px;font-weight:700}
+.app-head .date{font-size:13px;color:var(--muted)}
+.logo{font-family:var(--display);font-weight:800;color:var(--leaf);font-size:15px}
+.screen{flex:1;overflow-y:auto;padding:18px 20px 24px;display:flex;flex-direction:column;gap:18px}
+.screen[hidden]{display:none!important}
+nav.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--surface)}
+nav.tabs button{background:none;border:0;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted);cursor:pointer}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-selected="true"]{color:var(--leaf);font-weight:600}
+
+.card{background:var(--surface-2);border-radius:var(--r);padding:16px}
+.sec-title{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px}
+
+/* Today */
+.score{display:grid;grid-template-columns:108px 1fr;gap:16px;align-items:center}
+.ring text{font-family:var(--display);font-weight:800;fill:var(--fg)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.next{display:flex;align-items:center;gap:12px;background:var(--leaf);color:var(--leaf-ink);border-radius:var(--r);padding:14px 16px}
+.next .t{font-size:12px;opacity:.85}
+.next b{font-size:16px}
+.timeline{display:flex;flex-direction:column;gap:8px}
+.item{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;border-left:4px solid var(--cat)}
+.item .time{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted);line-height:1.25}
+.item .title{font-weight:600;font-size:14px;min-width:0}
+.item .chip{font-size:11px;color:var(--cat);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.item.done .title{text-decoration:line-through;color:var(--muted)}
+.check{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:none;cursor:pointer;display:grid;place-items:center}
+.item.done .check{background:var(--leaf);border-color:var(--leaf);color:var(--leaf-ink)}
+.del{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:none;cursor:pointer;color:var(--muted)}
+.tips{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.tips li{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.tips li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;margin-top:7px;background:var(--sun)}
+.tips li.ok::before{background:var(--leaf)}
+
+/* Plan */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
+.chipbtn[aria-pressed="true"]{background:var(--leaf);color:var(--leaf-ink);border-color:var(--leaf)}
+form.add{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+form.add .full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:500}
+input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:14px;width:100%;min-width:0}
+.primary{background:var(--leaf);color:var(--leaf-ink);border:0;border-radius:12px;padding:12px 16px;font-weight:600;cursor:pointer}
+.ghost{background:none;border:1px solid var(--line);border-radius:12px;padding:10px 14px;cursor:pointer;color:var(--muted);font-size:13px}
+
+/* Check-in */
+.moods{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mood{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 2px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.mood svg{width:28px;height:28px}
+.mood[aria-pressed="true"]{border-color:var(--leaf);color:var(--fg);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--leaf)}
+.range-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+input[type=range]{padding:0;accent-color:var(--river);border:0;background:none}
+.stress-val{font-family:var(--display);font-weight:700;font-size:18px;color:var(--fg)}
+.reflect{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;font-size:14px}
+.reflect b{display:block;margin-bottom:4px}
+.chart text{font-size:10px;fill:var(--muted);font-family:var(--body)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* Habits */
+.habit{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.habit-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.habit-top b{font-size:14px}
+.streak{font-size:12px;color:var(--river);font-weight:600;white-space:nowrap}
+.dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dot{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted)}
+.dot span{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:block}
+.dot.on span{background:var(--river);border-color:var(--river)}
+.dot button{background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--fg);font-weight:600}
+.dot button span{border-style:dashed;border-color:var(--river)}
+.dot.on button span{border-style:solid}
+
+.toast{position:absolute;left:50%;bottom:78px;transform:translateX(-50%) translateY(12px);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="stage">
+  <section class="brief" aria-label="About the project">
+    <div class="eyebrow">Study Life Balance · Good Health and Well-Being</div>
+    <h1>BalanceU</h1>
+    <p class="lede">A student well-being app that helps university students balance academic responsibilities with healthy daily habits. Plan study, breaks, exercise, meals and sleep in one place, then track how you feel.</p>
+    <p class="pov"><b>Point of view.</b> University students managing competing academic and personal commitments need realistic ways to protect time for rest and well-being, because fixed schedules, travel and work demands can reduce their flexibility and recovery time.</p>
+    <div>
+      <div class="sec-title">From our interviews to the app</div>
+      <div class="map">
+        <div class="map-row"><span>Time pressure from deadlines, commuting and overtime</span><span class="arrow">→</span><span>Plan: one schedule for study, work and rest</span></div>
+        <div class="map-row"><span>Sleep of 4–7 hours hurts focus the next day</span><span class="arrow">→</span><span>Sleep goal and late-study warnings</span></div>
+        <div class="map-row"><span>Exam stress and fear of underperforming</span><span class="arrow">→</span><span>Daily mood and stress check-in</span></div>
+        <div class="map-row"><span>Exercise 2–3 times a week, balanced meals</span><span class="arrow">→</span><span>Habit tracker with weekly streaks</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-title">Built around three interviewees</div>
+      <div class="personas"><span class="persona">Classroom Focuser</span><span class="persona">Campus Athlete</span><span class="persona">Working Senior</span></div>
+    </div>
+    <p class="small">Interactive prototype. Try loading each interviewee's day in the Plan tab, ticking off tasks, and saving a check-in. Data stays in your own browser.</p>
+  </section>
+
+  <div class="phone" id="app">
+    <header class="app-head">
+      <div><div class="logo">BalanceU</div><h2 id="screenTitle">Today</h2></div>
+      <div class="date" id="today"></div>
+    </header>
+
+    <main class="screen" id="s-today"></main>
+    <main class="screen" id="s-plan" hidden></main>
+    <main class="screen" id="s-check" hidden></main>
+    <main class="screen" id="s-habits" hidden></main>
+
+    <nav class="tabs" role="tablist" aria-label="App sections">
+      <button role="tab" data-tab="today" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Today</button>
+      <button role="tab" data-tab="plan" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4M8 14h3M8 17h6"/></svg>Plan</button>
+      <button role="tab" data-tab="check" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>Check-in</button>
+      <button role="tab" data-tab="habits" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22c4-3 7-7 7-11a7 7 0 0 0-14 0c0 4 3 8 7 11z"/><path d="M12 8v6M9 11h6"/></svg>Habits</button>
+    </nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<script>
+const CATS={study:"Study",work:"Work",rest:"Break",exercise:"Exercise",meal:"Meal",sleep:"Sleep",commute:"Commute"};
+const TEMPLATES={
+  balanced:{name:"Balanced day",blocks:[
+    ["07:30","08:00","Breakfast","meal"],["09:00","11:00","Lecture: Linear Algebra","study"],["11:00","11:15","Stretch break","rest"],
+    ["11:15","12:00","Review lecture notes","study"],["12:00","13:00","Lunch with friends","meal"],["13:00","15:00","Programming lab","study"],
+    ["15:00","15:20","Walk outside","rest"],["15:20","17:00","Assignment","study"],["17:30","18:30","Gym session","exercise"],
+    ["19:00","19:45","Dinner","meal"],["20:00","21:30","Exam review","study"],["21:30","22:30","Music & series","rest"],["23:00","07:00","Sleep","sleep"]]},
+  focuser:{name:"Classroom Focuser",blocks:[
+    ["07:45","08:15","Breakfast","meal"],["08:30","12:00","Lectures","study"],["12:00","13:00","Lunch","meal"],
+    ["13:00","16:00","Lab + tutorial","study"],["16:00","16:30","Coffee & walk","rest"],["18:00","19:00","Dinner","meal"],
+    ["19:00","00:00","Gaming (no schoolwork)","rest"],["00:30","06:45","Sleep","sleep"]]},
+  athlete:{name:"Campus Athlete",blocks:[
+    ["06:15","06:45","Breakfast","meal"],["06:45","07:45","Commute to campus","commute"],["08:00","12:00","Classes","study"],
+    ["12:00","13:00","Lunch","meal"],["13:00","15:00","Homework","study"],["15:30","17:00","Workout","exercise"],
+    ["17:00","18:00","Commute home","commute"],["18:30","19:15","Dinner","meal"],["19:15","21:30","Assignments","study"],
+    ["21:30","22:30","Stretch & shower","rest"],["22:45","06:00","Sleep","sleep"]]},
+  senior:{name:"Working Senior",blocks:[
+    ["07:00","07:30","Breakfast","meal"],["08:00","12:00","Part-time shift","work"],["12:00","12:45","Lunch","meal"],
+    ["12:45","17:30","Shift + overtime","work"],["18:00","18:45","Dinner","meal"],["19:00","22:30","Assignments (AI-prioritised list)","study"],
+    ["22:30","23:30","Series & unwind","rest"],["00:00","06:30","Sleep","sleep"]]}
+};
+const HABITS=[
+  {id:"sleep",name:"Sleep 7+ hours",week:[1,0,1,1,0,1,0]},
+  {id:"move",name:"Move for 30 minutes",week:[0,1,0,1,0,1,0]},
+  {id:"meals",name:"Eat three balanced meals",week:[1,1,0,1,1,1,0]},
+  {id:"cutoff",name:"No schoolwork after 22:00",week:[1,0,0,1,1,1,0]},
+  {id:"breaks",name:"Break every 90 minutes of study",week:[0,1,1,1,0,1,0]}
+];
+const SAMPLE_LOG=[{m:3,s:6,sl:6.5},{m:2,s:8,sl:5},{m:4,s:4,sl:7.5},{m:3,s:5,sl:7},{m:2,s:7,sl:6},{m:4,s:3,sl:8}];
+const MOODS=[["Drained","M8 16c1-1.5 2.5-2 4-2s3 .5 4 2"],["Low","M8.5 15.5c1-.7 2.2-1 3.5-1s2.5.3 3.5 1"],["Okay","M8.5 15h7"],["Good","M8.5 14.5c1 .8 2.2 1.2 3.5 1.2s2.5-.4 3.5-1.2"],["Great","M8 14c1 2 2.5 3 4 3s3-1 4-3"]];
+
+const KEY="balanceu-demo-v1";
+function fresh(){return{template:"balanced",blocks:TEMPLATES.balanced.blocks.map(toBlock),done:{},log:SAMPLE_LOG.slice(),todayCheck:null,habits:HABITS.map(h=>({...h,week:h.week.slice()}))}}
+function toBlock(a,i){return{id:"b"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5),start:a[0],end:a[1],title:a[2],cat:a[3]}}
+let S;try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+const $=s=>document.querySelector(s);
+const mins=t=>{const[h,m]=t.split(":").map(Number);return h*60+m};
+function span(b){let s=mins(b.start),e=mins(b.end);if(e<=s)e+=1440;return[s,e]}
+const hrs=m=>(Math.round(m/6)/10).toString().replace(/\.0$/,"");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function sorted(){return S.blocks.slice().sort((a,b)=>{const x=a.cat==="sleep"&&mins(a.start)<300?mins(a.start)+1440:mins(a.start);const y=b.cat==="sleep"&&mins(b.start)<300?mins(b.start)+1440:mins(b.start);return x-y})}
+
+function analyse(){
+  const t={study:0,work:0,rest:0,exercise:0,meal:0,sleep:0,commute:0};
+  S.blocks.forEach(b=>{const[s,e]=span(b);t[b.cat]+=e-s});
+  const warn=[],ok=[];
+  if(t.sleep<420)warn.push(`Sleep is ${hrs(t.sleep)} h. Aim for at least 7 hours so you can focus in class tomorrow.`);else ok.push(`Sleep goal met: ${hrs(t.sleep)} hours planned.`);
+  const load=sorted().filter(b=>b.cat==="study"||b.cat==="work");let longest=0,runS=null,runE=null;
+  load.forEach(b=>{const[s,e]=span(b);if(runE!==null&&s-runE<15){runE=e}else{runS=s;runE=e}longest=Math.max(longest,runE-runS)});
+  if(longest>=150)warn.push(`You have ${hrs(longest)} h of study or work in a row. Add a 15-minute break to recharge.`);else if(load.length)ok.push("Study blocks have breaks between them.");
+  if(t.exercise===0)warn.push("No movement planned today. Even a 30-minute walk helps with stress.");else ok.push(`${hrs(t.exercise)} h of exercise planned.`);
+  if(load.some(b=>{const[s,e]=span(b);return e>22*60}))warn.push("Schoolwork runs past 22:00. Try to keep the late evening for rest.");
+  const score=Math.max(20,100-warn.length*20);
+  return{t,warn,ok,score};
+}
+
+let tab="today";
+const TITLES={today:"Today",plan:"Plan my day",check:"Check-in",habits:"Habits"};
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+function go(t){tab=t;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  ["today","plan","check","habits"].forEach(k=>$("#s-"+k).hidden=k!==t);$("#screenTitle").textContent=TITLES[t];render()}
+function toast(msg){const el=$("#toast");el.textContent=msg;el.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("show"),1800)}
+
+const now=new Date();
+$("#today").textContent=now.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+const dayLabels=[...Array(7)].map((_,i)=>{const d=new Date(now);d.setDate(d.getDate()-6+i);return d.toLocaleDateString("en-GB",{weekday:"short"}).slice(0,2)});
+
+function itemHTML(b,mode){
+  const done=S.done[b.id];
+  const action=mode==="plan"?`<button class="del" data-del="${b.id}" aria-label="Remove ${esc(b.title)}">×</button>`
+    :`<button class="check" data-done="${b.id}" aria-label="Mark ${esc(b.title)} done">${done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-10"/></svg>':""}</button>`;
+  return `<div class="item ${done&&mode!=="plan"?"done":""}" style="--cat:var(--c-${b.cat})"><div class="time">${b.start}<br>${b.end}</div><div style="min-width:0"><div class="title">${esc(b.title)}</div><div class="chip">${CATS[b.cat]}</div></div>${action}</div>`
+}
+
+function renderToday(){
+  const a=analyse(),list=sorted(),C=2*Math.PI*42;
+  const cur=now.getHours()*60+now.getMinutes();
+  const next=list.find(b=>{const[s,e]=span(b);return e>cur&&!S.done[b.id]})||list[0];
+  const recovery=a.t.rest+a.t.exercise+a.t.meal;
+  $("#s-today").innerHTML=`
+    <div class="card score">
+      <svg class="ring" viewBox="0 0 100 100" width="108" height="108" role="img" aria-label="Balance score ${a.score} out of 100">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="10"/>
+        <circle cx="50" cy="50" r="42" fill="none" stroke="${a.score>=80?"var(--leaf)":a.score>=60?"var(--sun)":"var(--alert)"}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C*a.score/100} ${C}" transform="rotate(-90 50 50)"/>
+        <text x="50" y="52" text-anchor="middle" dominant-baseline="middle" font-size="26">${a.score}</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><b style="font-family:var(--display);font-size:17px">Balance score</b><div class="small">${a.score>=80?"Your day leaves room to recover.":a.score>=60?"A couple of tweaks would help.":"Your plan is overloaded today."}</div></div>
+        <div class="stats">
+          <div class="stat"><b>${hrs(a.t.study+a.t.work)}h</b><span>Study & work</span></div>
+          <div class="stat"><b>${hrs(recovery)}h</b><span>Recovery</span></div>
+          <div class="stat"><b>${hrs(a.t.sleep)}h</b><span>Sleep</span></div>
+        </div>
+      </div>
+    </div>
+    ${next?`<div class="next"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><div class="t">Next up · ${next.start}</div><b>${esc(next.title)}</b></div></div>`:""}
+    <div><div class="sec-title">Suggestions</div><ul class="tips">${a.warn.map(w=>`<li>${w}</li>`).join("")}${a.warn.length?"":a.ok.map(o=>`<li class="ok">${o}</li>`).join("")}</ul></div>
+    <div><div class="sec-title">Your day · ${list.filter(b=>S.done[b.id]).length} of ${list.length} done</div><div class="timeline">${list.map(b=>itemHTML(b,"today")).join("")}</div></div>`;
+}
+
+function renderPlan(){
+  const a=analyse();
+  $("#s-plan").innerHTML=`
+    <div><div class="sec-title">Load an interviewee's day</div>
+      <div class="chips">${Object.entries(TEMPLATES).map(([k,v])=>`<button class="chipbtn" data-tpl="${k}" aria-pressed="${S.template===k}">${v.name}</button>`).join("")}</div></div>
+    <div class="card"><div class="sec-title">Add to your plan</div>
+      <form class="add" id="addForm">
+        <label class="full" for="f-title">What
+          <input id="f-title" required placeholder="e.g. Read chapter 4" maxlength="60"></label>
+        <label for="f-cat">Type<select id="f-cat">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
+        <span></span>
+        <label for="f-start">Start<input id="f-start" type="time" value="16:00" required></label>
+        <label for="f-end">End<input id="f-end" type="time" value="17:00" required></label>
+        <button class="primary full" type="submit">Add to plan</button>
+      </form></div>
+    <div><div class="sec-title">Check on this plan</div><ul class="tips">${a.warn.map(w=>`<li>${w}</li>`).join("")}${a.ok.map(o=>`<li class="ok">${o}</li>`).join("")}</ul></div>
+    <div><div class="sec-title">Planned blocks</div><div class="timeline">${sorted().map(b=>itemHTML(b,"plan")).join("")}</div></div>
+    <button class="ghost" id="reset">Reset demo data</button>`;
+  $("#addForm").addEventListener("submit",e=>{e.preventDefault();
+    const title=$("#f-title").value.trim(),cat=$("#f-cat").value,st=$("#f-start").value,en=$("#f-end").value;
+    if(!title)return;if(cat!=="sleep"&&mins(en)<=mins(st)){toast("End time must be after start time");return}
+    S.blocks.push(toBlock([st,en,title,cat],0));S.template=null;save();render();toast("Added to your plan")});
+  $("#reset").addEventListener("click",()=>{S=fresh();save();render();toast("Demo data reset")});
+}
+
+let draft={m:null,s:5,sl:7,note:""};
+function renderCheck(){
+  if(S.todayCheck)draft={...S.todayCheck};
+  const log=[...S.log.slice(-6),S.todayCheck||null];
+  const W=320,H=150,top=12,bh=100,gw=W/7;
+  const bars=log.map((d,i)=>{const x=i*gw+gw/2;if(!d)return `<text x="${x}" y="${top+bh+16}" text-anchor="middle">${dayLabels[i]}</text><text x="${x}" y="${top+bh-6}" text-anchor="middle">–</text>`;
+    const mh=d.m/5*bh,sh=d.s/10*bh;
+    return `<rect x="${x-13}" y="${top+bh-mh}" width="11" height="${mh}" rx="3" fill="var(--leaf)"/><rect x="${x+2}" y="${top+bh-sh}" width="11" height="${sh}" rx="3" fill="var(--sun)"/><text x="${x}" y="${top+bh+16}" text-anchor="middle">${dayLabels[i]}</text>`}).join("");
+  const r=S.todayCheck;let reflect="";
+  if(r){reflect=r.s>=7?`<div class="reflect"><b>Stress is high today (${r.s}/10).</b>Ideas from other students: talk to a friend or family, take a 20-minute nap, or step outside for a short walk. Then pick one task to finish, not all of them.</div>`
+    :r.sl<7?`<div class="reflect"><b>You slept ${r.sl} hours.</b>Short sleep affects concentration the next day. Your plan now suggests moving late study earlier.</div>`
+    :`<div class="reflect"><b>Nice balance today.</b>Keep the same routine tomorrow and protect your evening rest.</div>`}
+  $("#s-check").innerHTML=`
+    <div><div class="sec-title">How are you feeling?</div>
+      <div class="moods">${MOODS.map((m,i)=>`<button class="mood" data-mood="${i+1}" aria-pressed="${draft.m===i+1}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><circle cx="9" cy="10" r=".9" fill="currentColor"/><circle cx="15" cy="10" r=".9" fill="currentColor"/><path d="${m[1]}"/></svg>${m[0]}</button>`).join("")}</div></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <label for="f-stress">Stress level <span class="stress-val" id="sv">${draft.s}/10</span>
+        <input id="f-stress" type="range" min="1" max="10" value="${draft.s}"></label>
+      <div class="range-row" style="margin-top:-10px"><span>Calm</span><span>Overwhelmed</span></div>
+      <label for="f-sleep">Hours slept last night<input id="f-sleep" type="number" min="0" max="14" step="0.5" value="${draft.sl}"></label>
+      <label for="f-note">What's on your mind? (optional)<textarea id="f-note" rows="2" placeholder="e.g. Discrete exam on Friday">${esc(draft.note||"")}</textarea></label>
+      <button class="primary" id="saveCheck">${r?"Update check-in":"Save check-in"}</button>
+    </div>
+    ${reflect}
+    <div><div class="sec-title">Last 7 days</div>
+      <svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Mood and stress for the last 7 days">
+        <line x1="0" x2="${W}" y1="${top+bh}" y2="${top+bh}" stroke="var(--line)"/>
+        <line x1="0" x2="${W}" y1="${top+bh/2}" y2="${top+bh/2}" stroke="var(--line)" stroke-dasharray="3 4"/>${bars}</svg>
+      <div class="legend"><span><i style="background:var(--leaf)"></i>Mood (1–5)</span><span><i style="background:var(--sun)"></i>Stress (1–10)</span></div>
+      <p class="small" style="margin:8px 0 0">Earlier days are example entries.</p></div>`;
+  $("#f-stress").addEventListener("input",e=>{draft.s=+e.target.value;$("#sv").textContent=draft.s+"/10"});
+  $("#f-sleep").addEventListener("input",e=>draft.sl=+e.target.value);
+  $("#f-note").addEventListener("input",e=>draft.note=e.target.value);
+  document.querySelectorAll("[data-mood]").forEach(b=>b.addEventListener("click",()=>{draft.m=+b.dataset.mood;document.querySelectorAll("[data-mood]").forEach(x=>x.setAttribute("aria-pressed",x===b))}));
+  $("#saveCheck").addEventListener("click",()=>{if(!draft.m){toast("Pick a mood first");return}
+    S.todayCheck={m:draft.m,s:draft.s,sl:draft.sl,note:draft.note};
+    const h=S.habits.find(x=>x.id==="sleep");if(h)h.week[6]=draft.sl>=7?1:0;save();render();toast("Check-in saved")});
+}
+
+function renderHabits(){
+  $("#s-habits").innerHTML=`<p class="small" style="margin:0">Tap today's circle when you've done it. Small habits, kept every week, protect your well-being during busy terms.</p>`+
+  S.habits.map(h=>{let st=0;for(let i=6;i>=0&&h.week[i];i--)st++;const n=h.week.filter(Boolean).length;
+    return `<div class="habit"><div class="habit-top"><b>${h.name}</b><span class="streak">${st?st+"-day streak":n+"/7 this week"}</span></div>
+      <div class="dots">${h.week.map((v,i)=>i===6?`<div class="dot ${v?"on":""}"><button data-habit="${h.id}" aria-pressed="${!!v}" aria-label="${h.name} today"><span></span>Today</button></div>`:`<div class="dot ${v?"on":""}"><span></span>${dayLabels[i]}</div>`).join("")}</div></div>`}).join("");
+}
+
+document.addEventListener("click",e=>{
+  const d=e.target.closest("[data-done]");if(d){const id=d.dataset.done;S.done[id]=!S.done[id];save();render();if(S.done[id])toast("Nice, one more done");return}
+  const x=e.target.closest("[data-del]");if(x){S.blocks=S.blocks.filter(b=>b.id!==x.dataset.del);S.template=null;save();render();toast("Removed");return}
+  const t=e.target.closest("[data-tpl]");if(t){S.template=t.dataset.tpl;S.blocks=TEMPLATES[t.dataset.tpl].blocks.map(toBlock);S.done={};save();render();toast(TEMPLATES[t.dataset.tpl].name+" loaded");return}
+  const h=e.target.closest("[data-habit]");if(h){const hb=S.habits.find(z=>z.id===h.dataset.habit);hb.week[6]=hb.week[6]?0:1;save();render();if(hb.week[6])toast("Habit logged");}
+});
+
+function render(){({today:renderToday,plan:renderPlan,check:renderCheck,habits:renderHabits})[tab]()}
+render();
+</script>
